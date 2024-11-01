@@ -1,0 +1,7 @@
+default-jdk
+maven
+docker
+iputils-ping
+net-tools
+curl
+wget
