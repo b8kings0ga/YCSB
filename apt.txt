@@ -11,4 +11,5 @@ ca-certificates
 gnupg
 lsb-release
 software-properties-common
+ruby
 
