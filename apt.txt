@@ -5,3 +5,10 @@ iputils-ping
 net-tools
 curl
 wget
+google-cloud-cli
+apt-transport-https 
+ca-certificates 
+gnupg
+lsb-release
+software-properties-common
+
