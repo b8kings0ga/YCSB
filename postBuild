@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Download the Google Cloud SDK tarball
+curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+
+# Extract the tarball
+tar -xzf google-cloud-cli-linux-x86_64.tar.gz
+
+# Navigate to the extracted directory
+cd google-cloud-sdk
+
+# Run the installation script
+./install.sh
+
+# Initialize the gcloud environment
+./bin/gcloud init
