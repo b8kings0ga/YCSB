@@ -11,6 +11,3 @@ cd google-cloud-sdk
 
 # Run the installation script
 ./install.sh
-
-# Initialize the gcloud environment
-./bin/gcloud init
