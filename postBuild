@@ -11,3 +11,11 @@ cd google-cloud-sdk
 
 # Run the installation script
 ./install.sh
+
+
+# Add gcloud to PATH
+echo 'export PATH=$PATH:~/google-cloud-sdk/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# install componants gcloud cbt kubectl docker
+gcloud components install cbt kubectl docker
