@@ -21,7 +21,12 @@ source ~/.bashrc
 cd ~
 curl -OL http://apache.mirror.digitalpacific.com.au/cassandra/4.0.0/apache-cassandra-4.0.0-bin.tar.gz
 
-tar -xzf apache-cassandra-4.0.0-bin.tar.gz
+
+gpg --print-md SHA256 apache-cassandra-4.0.0-bin.tar.gz
+curl -L https://downloads.apache.org/cassandra/4.0.0/apache-cassandra-4.0.0-bin.tar.gz.sha256
+
+
+tar xzvf apache-cassandra-4.0.0-bin.tar.gz
 
 # Navigate to the extracted directory
 cd apache-cassandra-4.0.0
