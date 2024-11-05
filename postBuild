@@ -16,3 +16,17 @@ cd google-cloud-sdk
 # Add gcloud to PATH
 echo 'export PATH=$PATH:~/google-cloud-sdk/bin' >> ~/.bashrc
 source ~/.bashrc
+
+# install cassandra using tarball
+cd ~
+curl -OL http://apache.mirror.digitalpacific.com.au/cassandra/4.0.0/apache-cassandra-4.0.0-bin.tar.gz
+
+tar -xzf apache-cassandra-4.0.0-bin.tar.gz
+
+# Navigate to the extracted directory
+cd apache-cassandra-4.0.0
+
+# Add cassandra to PATH
+echo 'export PATH=$PATH:~/apache-cassandra-4.0.0/bin' >> ~/.bashrc
+source ~/.bashrc
+

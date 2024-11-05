@@ -12,4 +12,3 @@ gnupg
 lsb-release
 software-properties-common
 ruby
-cassandra
