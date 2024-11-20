@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../gitlab.awx.im/awx-platform/ml-platform/ml-gitops.git"
+		}
+	],
+	"settings": {}
+}

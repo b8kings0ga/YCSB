@@ -1,6 +1,6 @@
 # ...existing code...
 
-YCSB="../bin/ycsb.sh"
+YCSB="bin/ycsb.sh"
 GCP_USER="shen.li@airwallex.com"
 
 PROJECT=risk-nonprod-87a1e6c5
@@ -8,38 +8,48 @@ INSTANCE=test-evaluation
 FAMILY=cf
 SPLITS=$(echo 'num_splits = 200; puts (1..num_splits).map {|i| "user#{1000+i*(9999-1000)/num_splits}"}.join(",")' | ruby)
 
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q "$GCP_USER"; then
+    echo "GCP login required. Please log in to your GCP account:"
+    gcloud auth login --no-browser
+    echo "Please copy the URL above and open it in your browser to complete the login process."
+    export GOOGLE_APPLICATION_CREDENTIALS=~/.config/gcloud/legacy_credentials/$GCP_USER/adc.json
+fi
+
 # Install cbt component
-gcloud components install cbt
+#gcloud components install cbt
 # Prompt user to log in to GCP
-echo "Please log in to your GCP account:"
-gcloud auth login --no-browser
-echo "Please copy the URL above and open it in your browser to complete the login process."
 
-# ...existing code...
-export GOOGLE_APPLICATION_CREDENTIALS=~/.config/gcloud/legacy_credentials/$GCP_USER/adc.json
-
-cbt -project $PROJECT -instance=$INSTANCE createtable usertable families=$FAMILY:maxversions=1 splits=$SPLITS
+#cbt -project $PROJECT -instance=$INSTANCE createtable usertable families=$FAMILY:maxversions=1 splits=$SPLITS
 
 THREADS=1000
+RECORDCOUNT=1000000
+OPERATIONCOUNT=1000000
+
+
 WORKSPACE=./MyWorkspace
 
 declare -a TESTS
 TESTS=(
-    "workload-insert.ini"
-    "workload-read.ini"
-    "workload-real.ini"
+    "./bench-suits/workload-insert.ini"
+    "./bench-suits/workload-read.ini"
+    "./bench-suits/workload-real.ini"
 )
+
+$YCSB load googlebigtable2 -P ./bench-suits/workload-insert.ini \
+        -threads $THREADS \
+        -p recordcount=$RECORDCOUNT \
+        -p operationcount=$OPERATIONCOUNT \
+        -p googlebigtable2.project=$PROJECT \
+        -p googlebigtable2.instance=$INSTANCE \
+        -p googlebigtable2.family=$FAMILY
 
 for WORKLOAD in "${TESTS[@]}"; do
     TEST=$(basename "$WORKLOAD" .ini)
-    $YCSB load googlebigtable2 -P $WORKLOAD \
-        -threads $THREADS \
-        -p googlebigtable2.project=$PROJECT \
-        -p googlebigtable2.instance=$INSTANCE \
-        -p googlebigtable2.family=$FAMILY > $WORKSPACE/${TEST}-bt-load.log
 
     $YCSB run googlebigtable2 -P $WORKLOAD \
         -threads $THREADS \
+        -p recordcount=$RECORDCOUNT \
+        -p operationcount=$OPERATIONCOUNT \
         -p googlebigtable2.project=$PROJECT \
         -p googlebigtable2.instance=$INSTANCE \
         -p googlebigtable2.family=$FAMILY > $WORKSPACE/${TEST}-bt-run.log
@@ -70,16 +80,21 @@ CREATE TABLE IF NOT EXISTS usertable (
 # then find the service of scylla
 SCYLLAHOST="scylla-client.scylla.svc.cluster.local"
 
-for WORKLOAD in "${TESTS[@]}"; do
-
-    $YCSB load scylla -s -P $WORKLOAD \
+$YCSB load scylla -s -P ./bench-suits/workload-insert.ini \
         -threads $THREADS \
+        -p recordcount=$RECORDCOUNT \
+        -p operationcount=$OPERATIONCOUNT \
         -p cassandra.username=cassandra \
         -p cassandra.password=cassandra \
-        -p scylla.hosts=$SCYLLAHOST > $WORKSPACE/${TEST}-scylla-load.log
+        -p scylla.hosts=$SCYLLAHOST
+
+for WORKLOAD in "${TESTS[@]}"; do
+    TEST=$(basename "$WORKLOAD" .ini)
 
     $YCSB run scylla -s -P $WORKLOAD \
         -threads $THREADS \
+        -p recordcount=$RECORDCOUNT \
+        -p operationcount=$OPERATIONCOUNT \
         -p cassandra.username=cassandra \
         -p cassandra.password=cassandra \
         -p scylla.hosts=$SCYLLAHOST > $WORKSPACE/${TEST}-scylla-run.log
